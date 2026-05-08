@@ -17,6 +17,12 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function yesterdayStr() {
+  const d = new Date()
+  d.setDate(d.getDate() - 1)
+  return d.toISOString().slice(0, 10)
+}
+
 function formatDate(str) {
   const d = new Date(`${str}T12:00:00`)
   return d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
@@ -191,10 +197,12 @@ export default function TrackerClient({ initialTreatment }) {
   const [history, setHistory] = useState(initialTreatment.injections)
   const [selectedZone, setSelectedZone] = useState(null)
   const [date, setDate] = useState(todayStr())
+  const [dateQuick, setDateQuick] = useState('today')
   const [slot, setSlot] = useState('first')
   const [notes, setNotes] = useState('')
   const [catName, setCatName] = useState(initialTreatment.catName)
   const [saving, setSaving] = useState(false)
+  const [justSaved, setJustSaved] = useState(false)
   const [toast, setToast] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
 
@@ -267,7 +275,10 @@ export default function TrackerClient({ initialTreatment }) {
       setHistory(prev => [injection, ...prev])
       setSelectedZone(null)
       setNotes('')
+      setDateQuick('today')
       setDate(todayStr())
+      setJustSaved(true)
+      setTimeout(() => setJustSaved(false), 1500)
       showToast(`✓ ${slot === 'first' ? '1ª' : '2ª'} dosis guardada`)
     } catch {
       showToast('No se pudo guardar')
@@ -389,7 +400,15 @@ export default function TrackerClient({ initialTreatment }) {
               </button>
             </div>
 
-            <input type="date" className="date-input" value={date} onChange={e => setDate(e.target.value)} />
+            <div className="date-quick-group">
+              <button type="button" className={`date-quick-btn ${dateQuick === 'today' ? 'active' : ''}`} onClick={() => { setDateQuick('today'); setDate(todayStr()) }}>Hoy</button>
+              <button type="button" className={`date-quick-btn ${dateQuick === 'yesterday' ? 'active' : ''}`} onClick={() => { setDateQuick('yesterday'); setDate(yesterdayStr()) }}>Ayer</button>
+              <button type="button" className={`date-quick-btn ${dateQuick === 'custom' ? 'active' : ''}`} onClick={() => setDateQuick('custom')}>Elegir fecha...</button>
+            </div>
+
+            {dateQuick === 'custom' && (
+              <input type="date" className="date-input" value={date} onChange={e => setDate(e.target.value)} />
+            )}
 
             <textarea
               className="notes-input"
@@ -399,8 +418,14 @@ export default function TrackerClient({ initialTreatment }) {
               onChange={e => setNotes(e.target.value)}
             />
 
-            <button className="btn-log" disabled={!selectedZone || saving} onClick={handleLog}>
-              {saving ? 'Guardando...' : `Guardar ${slot === 'first' ? '1ª' : '2ª'} dosis`}
+            {selectedZone && (
+              <div className="log-summary">
+                📍 {ZONE_MAP[selectedZone]?.label} · {slot === 'first' ? '1ª' : '2ª'} dosis · {slot === 'first' ? formatTime(firstTime) : formatTime(secondTime)} · {date === todayStr() ? 'Hoy' : date === yesterdayStr() ? 'Ayer' : formatDate(date)}
+              </div>
+            )}
+
+            <button className={`btn-log ${justSaved ? 'saved' : ''}`} disabled={!selectedZone || saving || justSaved} onClick={handleLog}>
+              {justSaved ? '✓ Guardado' : saving ? 'Guardando...' : `Guardar ${slot === 'first' ? '1ª' : '2ª'} dosis`}
             </button>
           </div>
 

@@ -444,6 +444,52 @@ h1, h2, h3 {
   color: var(--ink-soft);
 }
 
+/* Quick date buttons */
+.date-quick-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.date-quick-btn {
+  background: var(--cream);
+  border: 1.5px solid var(--amber-light);
+  border-radius: 10px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.45rem 0.3rem;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.date-quick-btn:hover {
+  border-color: var(--amber);
+}
+
+.date-quick-btn.active {
+  background: var(--sage-light);
+  border-color: var(--sage);
+  color: var(--ink);
+}
+
+/* Log summary */
+.log-summary {
+  background: var(--cream);
+  border: 1px dashed var(--amber-light);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
 .selected-zone-display {
   background: var(--cream);
   border-radius: 10px;
@@ -514,6 +560,17 @@ h1, h2, h3 {
 
 .btn-log:hover:not(:disabled) { background: var(--rust); transform: translateY(-1px); }
 .btn-log:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-log.saved {
+  background: var(--sage);
+  animation: btnSavedPulse 0.3s ease;
+}
+
+@keyframes btnSavedPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
 
 /* History */
 .history-panel {
