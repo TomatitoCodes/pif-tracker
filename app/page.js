@@ -14,7 +14,10 @@ export default function Home() {
         <p>
           Generá un link privado para compartir con familia, veterinaria o cuidadores.
         </p>
-        <a className="btn-home" href="/t/new">Crear tracker</a>
+        <div className="home-actions">
+          <a className="btn-home" href="/register">Crear cuenta</a>
+          <a className="btn-secondary" href="/login">Ya tengo cuenta</a>
+        </div>
       </section>
     </main>
   )

@@ -30,6 +30,12 @@ function daysDiff(dateStr) {
   return Math.round((now - then) / 86400000)
 }
 
+function addDays(dateStr, days) {
+  const date = new Date(`${dateStr}T00:00:00`)
+  date.setDate(date.getDate() + days)
+  return date.toISOString().slice(0, 10)
+}
+
 function CatDiagram({ selected, history, onSelect }) {
   const lastUsed = {}
   history.forEach(entry => {
@@ -179,7 +185,7 @@ export default function TrackerClient({ initialTreatment }) {
   }, [])
 
   const suggested = getSuggestedZone(history)
-  const shareUrl = typeof window === 'undefined' ? '' : window.location.href
+  const currentTreatmentDay = Math.min(Math.max(daysDiff(initialTreatment.startedAt) + 1, 1), 84)
 
   async function saveCatName() {
     try {
@@ -196,12 +202,12 @@ export default function TrackerClient({ initialTreatment }) {
     }
   }
 
-  async function handleCopyLink() {
+  async function handleLogout() {
     try {
-      await navigator.clipboard.writeText(shareUrl)
-      showToast('Link copiado')
+      await fetch('/api/auth/logout', { method: 'POST' })
+      window.location.href = '/login'
     } catch {
-      showToast(shareUrl)
+      showToast('No se pudo cerrar sesión')
     }
   }
 
@@ -288,7 +294,7 @@ export default function TrackerClient({ initialTreatment }) {
             maxLength={30}
           />
         </div>
-        <button className="btn-link" onClick={handleCopyLink}>Copiar link compartible</button>
+        <button className="btn-link" onClick={handleLogout}>Cerrar sesión</button>
       </header>
 
       <div className="suggestion">
@@ -379,7 +385,52 @@ export default function TrackerClient({ initialTreatment }) {
         </div>
       </div>
 
+      <TreatmentCalendar
+        history={history}
+        startedAt={initialTreatment.startedAt}
+        startDay={initialTreatment.startDay}
+        currentTreatmentDay={currentTreatmentDay}
+      />
+
       <div className={`toast ${toastVisible ? 'show' : ''}`}>{toast}</div>
     </main>
+  )
+}
+
+function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }) {
+  const injectionByDate = Object.fromEntries(history.map(entry => [entry.date, entry]))
+  const firstTrackedDay = Number(startDay) || 1
+
+  return (
+    <section className="calendar-panel">
+      <div className="calendar-heading">
+        <div>
+          <h2>Calendario del tratamiento</h2>
+          <p>Día actual estimado: {currentTreatmentDay} de 84 · seguimiento desde día {firstTrackedDay}</p>
+        </div>
+      </div>
+
+      <div className="calendar-grid" aria-label="Seguimiento de 84 días">
+        {Array.from({ length: 84 }, (_, index) => {
+          const day = index + 1
+          const date = addDays(startedAt, index)
+          const injection = injectionByDate[date]
+          const className = [
+            'calendar-day',
+            injection ? 'done' : '',
+            day === currentTreatmentDay ? 'current' : '',
+            day < firstTrackedDay && !injection ? 'previous' : '',
+            day >= firstTrackedDay && day < currentTreatmentDay && !injection ? 'missed' : '',
+          ].filter(Boolean).join(' ')
+
+          return (
+            <div key={day} className={className} title={`${formatDate(date)}${injection ? ` - ${injection.zone}` : ''}`}>
+              <strong>{day}</strong>
+              {injection && <span>✓</span>}
+            </div>
+          )
+        })}
+      </div>
+    </section>
   )
 }

@@ -20,6 +20,12 @@ Tracking de inyecciones GS45 para tu gatito.
 
 4. Creá las tablas ejecutando `db/schema.sql` en el SQL Editor de Neon.
 
+   Si ya tenías la primera versión de la base, ejecutá también:
+
+   ```txt
+   db/002-auth-and-calendar.sql
+   ```
+
 5. Levantá la app:
 
    ```bash
@@ -32,3 +38,7 @@ Tracking de inyecciones GS45 para tu gatito.
 - `DATABASE_URL_UNPOOLED`: conexión directa para migraciones o tareas administrativas.
 
 No commitees `.env.local` ni credenciales reales.
+
+## Modelo de acceso
+
+La app requiere cuenta con email y contraseña. Cada usuario tiene su tratamiento y el día inicial del plan de 84 días, para poder empezar el seguimiento aunque ya haya comenzado el tratamiento.
