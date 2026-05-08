@@ -15,8 +15,7 @@ export default async function RegisterPage() {
   return (
     <main className="app auth-page">
       <header className="header">
-        <div className="header-paw">🐾</div>
-        <h1>Crear <span>cuenta</span></h1>
+        <img className="brand-logo" src="/logo%20piftracker.webp" alt="PIF Tracker" />
         <p className="home-copy">Guardá el seguimiento de tu gato y retomalo desde cualquier dispositivo.</p>
       </header>
       <AuthForm mode="register" />

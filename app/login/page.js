@@ -15,8 +15,7 @@ export default async function LoginPage() {
   return (
     <main className="app auth-page">
       <header className="header">
-        <div className="header-paw">🐾</div>
-        <h1>Entrar</h1>
+        <img className="brand-logo" src="/logo%20piftracker.webp" alt="PIF Tracker" />
         <p className="home-copy">Continuá el control del tratamiento de tu gato.</p>
       </header>
       <AuthForm mode="login" />

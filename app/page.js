@@ -2,8 +2,7 @@ export default function Home() {
   return (
     <main className="app home-page">
       <header className="header">
-        <div className="header-paw">🐾</div>
-        <h1>Tracker <span>PIF</span></h1>
+        <img className="brand-logo" src="/logo%20piftracker.webp" alt="PIF Tracker" />
         <p className="home-copy">
           Registro compartible de zonas de inyección para el tratamiento del PIF felino.
         </p>

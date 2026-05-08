@@ -9,8 +9,6 @@ const ZONES = [
   { id: 'espalda-der', label: 'Espalda Der.',    color: '#5d8f82', cx: 166, cy: 100 },
   { id: 'lomo-izq',    label: 'Lomo Izq.',      color: '#9c7bb5', cx: 95,  cy: 145 },
   { id: 'lomo-der',    label: 'Lomo Der.',       color: '#7b6fa0', cx: 171, cy: 145 },
-  { id: 'cadera-izq',  label: 'Cadera Izq.',    color: '#c0756b', cx: 105, cy: 192 },
-  { id: 'cadera-der',  label: 'Cadera Der.',     color: '#b05a5a', cx: 161, cy: 192 },
 ]
 
 const ZONE_MAP = Object.fromEntries(ZONES.map(z => [z.id, z]))
@@ -22,6 +20,16 @@ function todayStr() {
 function formatDate(str) {
   const d = new Date(`${str}T12:00:00`)
   return d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
+function formatMonth(str) {
+  const d = new Date(`${str}T12:00:00`)
+  return d.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+}
+
+function formatCalendarDate(str) {
+  const d = new Date(`${str}T12:00:00`)
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
 }
 
 function daysDiff(dateStr) {
@@ -281,8 +289,7 @@ export default function TrackerClient({ initialTreatment }) {
   return (
     <main className="app">
       <header className="header">
-        <div className="header-paw">🐾</div>
-        <h1>Tracker <span>PIF</span></h1>
+        <img className="brand-logo" src="/logo%20piftracker.webp" alt="PIF Tracker" />
         <div className="cat-name-input-wrap">
           <span style={{ color: 'var(--ink-muted)', fontSize: '0.9rem' }}>para</span>
           <input
@@ -400,6 +407,24 @@ export default function TrackerClient({ initialTreatment }) {
 function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }) {
   const injectionByDate = Object.fromEntries(history.map(entry => [entry.date, entry]))
   const firstTrackedDay = Number(startDay) || 1
+  const days = Array.from({ length: 84 }, (_, index) => {
+    const day = index + 1
+    const date = addDays(startedAt, index)
+    const monthKey = date.slice(0, 7)
+
+    return { day, date, monthKey, monthLabel: formatMonth(date) }
+  })
+  const months = days.reduce((groups, dayInfo) => {
+    const existing = groups.find(group => group.key === dayInfo.monthKey)
+
+    if (existing) {
+      existing.days.push(dayInfo)
+    } else {
+      groups.push({ key: dayInfo.monthKey, label: dayInfo.monthLabel, days: [dayInfo] })
+    }
+
+    return groups
+  }, [])
 
   return (
     <section className="calendar-panel">
@@ -410,26 +435,37 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
         </div>
       </div>
 
-      <div className="calendar-grid" aria-label="Seguimiento de 84 días">
-        {Array.from({ length: 84 }, (_, index) => {
-          const day = index + 1
-          const date = addDays(startedAt, index)
-          const injection = injectionByDate[date]
-          const className = [
-            'calendar-day',
-            injection ? 'done' : '',
-            day === currentTreatmentDay ? 'current' : '',
-            day < firstTrackedDay && !injection ? 'previous' : '',
-            day >= firstTrackedDay && day < currentTreatmentDay && !injection ? 'missed' : '',
-          ].filter(Boolean).join(' ')
+      <div className="calendar-months" aria-label="Seguimiento de 84 días">
+        {months.map(month => (
+          <div className="calendar-month" key={month.key}>
+            <h3>{month.label}</h3>
+            <div className="calendar-grid">
+              {month.days.map(({ day, date }) => {
+                const injection = injectionByDate[date]
+                const status = injection
+                  ? 'done'
+                  : day < firstTrackedDay
+                    ? 'previous'
+                    : day < currentTreatmentDay
+                      ? 'missed'
+                      : 'pending'
+                const className = [
+                  'calendar-day',
+                  status,
+                  day === currentTreatmentDay ? 'current' : '',
+                ].filter(Boolean).join(' ')
 
-          return (
-            <div key={day} className={className} title={`${formatDate(date)}${injection ? ` - ${injection.zone}` : ''}`}>
-              <strong>{day}</strong>
-              {injection && <span>✓</span>}
+                return (
+                  <div key={day} className={className} title={`${formatDate(date)}${injection ? ` - ${injection.zone}` : ''}`}>
+                    <div className="calendar-day-strip" />
+                    <strong>Día {day}</strong>
+                    <span>{formatCalendarDate(date)}</span>
+                  </div>
+                )
+              })}
             </div>
-          )
-        })}
+          </div>
+        ))}
       </div>
     </section>
   )
