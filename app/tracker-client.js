@@ -557,6 +557,33 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
           })}
         </div>
       </div>
+
+      <div className="calendar-legend">
+        <div className="calendar-legend-item">
+          <div className="calendar-legend-strip calendar-legend-done" />
+          <span>2 dosis</span>
+        </div>
+        <div className="calendar-legend-item">
+          <div className="calendar-legend-strip calendar-legend-partial" />
+          <span>1 dosis</span>
+        </div>
+        <div className="calendar-legend-item">
+          <div className="calendar-legend-strip calendar-legend-missed" />
+          <span>Faltante</span>
+        </div>
+        <div className="calendar-legend-item">
+          <div className="calendar-legend-strip calendar-legend-previous" />
+          <span>Sin registro</span>
+        </div>
+        <div className="calendar-legend-item">
+          <div className="calendar-legend-strip calendar-legend-current" />
+          <span>Día trat.</span>
+        </div>
+        <div className="calendar-legend-item">
+          <div className="calendar-legend-strip calendar-legend-today" />
+          <span>Hoy</span>
+        </div>
+      </div>
     </section>
   )
 }

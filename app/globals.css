@@ -831,6 +831,38 @@ h1, h2, h3 {
 
 .calendar-day.missed .calendar-day-strip { background: var(--rust); }
 
+.calendar-legend {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(245, 212, 154, 0.6);
+}
+
+.calendar-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+}
+
+.calendar-legend-strip {
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.calendar-legend-done { background: var(--sage); }
+.calendar-legend-partial { background: var(--amber); }
+.calendar-legend-missed { background: var(--rust); }
+.calendar-legend-previous { background: #d8c7b5; }
+.calendar-legend-current { background: var(--amber-deep); }
+.calendar-legend-today { background: #fff4e0; border: 1.5px solid var(--amber-deep); }
+
 @media (max-width: 580px) {
   .app { max-width: 780px; }
   .calendar-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
