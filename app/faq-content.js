@@ -13,7 +13,7 @@ export default function FaqContent() {
       <details className="faq-item">
         <summary>¿Por qué pide correo electrónico?</summary>
         <p>
-          Es únicamente para que puedas acceder a tu tratamiento. No voy a mandarte nada, no hay
+          Es únicamente para que puedas acceder a tu tratamiento. No voy a enviarte nada, no hay
           newsletters, no hay spam. Es literalmente solo para que puedas iniciar sesión.
         </p>
       </details>

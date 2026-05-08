@@ -13,7 +13,7 @@ export default function Home() {
       <section className="home-card">
         <h2>Crear tratamiento</h2>
         <p>
-          Generá un link privado para compartir con familia, veterinaria o cuidadores.
+          Genera un enlace privado para compartir con familia, veterinaria o cuidadores.
         </p>
         <div className="home-actions">
           <a className="btn-home" href="/register">Crear cuenta</a>

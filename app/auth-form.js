@@ -56,7 +56,7 @@ export default function AuthForm({ mode }) {
 
       {isRegister && (
         <label>
-          ¿Por qué día del tratamiento empezás en la app?
+          ¿Por qué día del tratamiento empiezas en la aplicación?
           <select value={startDay} onChange={e => setStartDay(e.target.value)}>
             {Array.from({ length: 84 }, (_, index) => index + 1).map(day => (
               <option key={day} value={day}>Día {day}</option>
@@ -111,9 +111,9 @@ export default function AuthForm({ mode }) {
         <div className="forgot-dialog-content">
           <button className="forgot-close" onClick={() => setShowForgot(false)}>×</button>
           <h3>Recuperar contraseña</h3>
-          <p>No hay recuperación automática. Mandame un correo a:</p>
+          <p>No hay recuperación automática. Envíame un correo a:</p>
           <a href="mailto:hola@garciagarcia.cc?subject=Recuperar%20contraseña%20PIF%20Tracker">hola@garciagarcia.cc</a>
-          <p className="forgot-hint">Decime tu email de registro y te ayudo.</p>
+          <p className="forgot-hint">Dime tu correo de registro y te ayudo.</p>
         </div>
       </dialog>
     </form>

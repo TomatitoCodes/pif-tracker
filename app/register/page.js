@@ -16,10 +16,10 @@ export default async function RegisterPage() {
     <main className="app auth-page">
       <header className="header">
         <img className="brand-logo" src="/logo%20piftracker.webp" alt="PIF Tracker" />
-        <p className="home-copy">Guardá el seguimiento de tu gato y retomalo desde cualquier dispositivo.</p>
+        <p className="home-copy">Guarda el seguimiento de tu gato y retómalo desde cualquier dispositivo.</p>
       </header>
       <AuthForm mode="register" />
-      <p className="auth-switch">¿Ya tenés cuenta? <a href="/login">Entrá acá</a></p>
+      <p className="auth-switch">¿Ya tienes cuenta? <a href="/login">Entra aquí</a></p>
     </main>
   )
 }
