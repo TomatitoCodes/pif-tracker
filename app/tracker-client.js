@@ -271,7 +271,10 @@ export default function TrackerClient({ initialTreatment }) {
         body: JSON.stringify({ zone: selectedZone, date, slot, notes }),
       })
 
-      if (!response.ok) throw new Error('Failed to save injection')
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload.error || 'No se pudo guardar')
+      }
 
       const { injection } = await response.json()
       setHistory(prev => [injection, ...prev])
@@ -282,8 +285,8 @@ export default function TrackerClient({ initialTreatment }) {
       setJustSaved(true)
       setTimeout(() => setJustSaved(false), 1500)
       showToast(`✓ ${slot === 'first' ? '1ª' : '2ª'} dosis guardada`)
-    } catch {
-      showToast('No se pudo guardar')
+    } catch (err) {
+      showToast(err.message || 'No se pudo guardar')
     } finally {
       setSaving(false)
     }
@@ -295,11 +298,14 @@ export default function TrackerClient({ initialTreatment }) {
         method: 'DELETE',
       })
 
-      if (!response.ok) throw new Error('Failed to delete injection')
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload.error || 'No se pudo eliminar')
+      }
       setHistory(prev => prev.filter(e => e.id !== id))
       showToast('Entrada eliminada')
-    } catch {
-      showToast('No se pudo eliminar')
+    } catch (err) {
+      showToast(err.message || 'No se pudo eliminar')
     }
   }
 
@@ -415,6 +421,7 @@ export default function TrackerClient({ initialTreatment }) {
             <textarea
               className="notes-input"
               rows={2}
+              maxLength={1000}
               placeholder="Notas opcionales (reacción, dosis…)"
               value={notes}
               onChange={e => setNotes(e.target.value)}

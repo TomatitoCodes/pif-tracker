@@ -6,19 +6,26 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
-  const body = await request.json().catch(() => ({}))
-  const result = await registerUser({
-    email: body.email,
-    password: body.password,
-    passwordConfirmation: body.passwordConfirmation,
-    catName: body.catName,
-    startDay: body.startDay,
-    firstInjectionTime: body.firstInjectionTime,
-  })
+  try {
+    const body = await request.json().catch(() => ({}))
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
 
-  if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 400 })
+    const result = await registerUser({
+      email: body.email,
+      password: body.password,
+      passwordConfirmation: body.passwordConfirmation,
+      catName: body.catName,
+      startDay: body.startDay,
+      firstInjectionTime: body.firstInjectionTime,
+    }, { ip })
+
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 400 })
+    }
+
+    return NextResponse.json({ shareToken: result.shareToken }, { status: 201 })
+  } catch (error) {
+    console.error('Failed to register user', error)
+    return NextResponse.json({ error: 'No se pudo crear la cuenta' }, { status: 500 })
   }
-
-  return NextResponse.json({ shareToken: result.shareToken }, { status: 201 })
 }

@@ -51,6 +51,14 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
+    if (error.message === 'Too many requests. Try again later.') {
+      return NextResponse.json({ error: error.message }, { status: 429 })
+    }
+
+    if (error?.code === '23505') {
+      return NextResponse.json({ error: 'Ya registraste esa dosis para este día' }, { status: 400 })
+    }
+
     console.error('Failed to create injection', error)
     return NextResponse.json({ error: 'Could not create injection' }, { status: 500 })
   }

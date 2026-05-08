@@ -18,6 +18,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    if (error.message === 'Invalid treatment start day' || error.message === 'User is required') {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
     console.error('Failed to create treatment', error)
     return NextResponse.json({ error: 'Could not create treatment' }, { status: 500 })
   }
