@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { createTreatment } from '../../../lib/treatments'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   try {
