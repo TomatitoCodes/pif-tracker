@@ -461,6 +461,7 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
   })
 
   const firstTrackedDay = Number(startDay) || 1
+  const todayDate = todayStr()
   const days = Array.from({ length: 84 }, (_, index) => {
     const day = index + 1
     const date = addDays(startedAt, index)
@@ -480,6 +481,12 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
     return groups
   }, [])
 
+  const currentDayEntry = days.find(d => d.day === currentTreatmentDay)
+  const currentMonthKey = currentDayEntry ? currentDayEntry.monthKey : todayDate.slice(0, 7)
+  const initialIndex = months.findIndex(m => m.key === currentMonthKey)
+  const [visibleIndex, setVisibleIndex] = useState(Math.max(initialIndex, 0))
+  const visibleMonth = months[visibleIndex]
+
   return (
     <section className="calendar-panel">
       <div className="calendar-heading">
@@ -489,45 +496,66 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
         </div>
       </div>
 
-      <div className="calendar-months" aria-label="Seguimiento de 84 días">
-        {months.map(month => (
-          <div className="calendar-month" key={month.key}>
-            <h3>{month.label}</h3>
-            <div className="calendar-grid">
-              {month.days.map(({ day, date }) => {
-                const dayInjections = injectionsByDate[date] || {}
-                const hasFirst = !!dayInjections.first
-                const hasSecond = !!dayInjections.second
-                const status = hasFirst && hasSecond
-                  ? 'done'
-                  : (hasFirst || hasSecond)
-                    ? 'partial'
-                    : day < firstTrackedDay
-                      ? 'previous'
-                      : day < currentTreatmentDay
-                        ? 'missed'
-                        : 'pending'
-                const className = [
-                  'calendar-day',
-                  status,
-                  day === currentTreatmentDay ? 'current' : '',
-                ].filter(Boolean).join(' ')
+      <div className="calendar-nav">
+        <button
+          type="button"
+          className="calendar-nav-btn"
+          onClick={() => setVisibleIndex(i => Math.max(0, i - 1))}
+          disabled={visibleIndex === 0}
+          aria-label="Mes anterior"
+        >
+          ←
+        </button>
+        <h3 className="calendar-month-title">{visibleMonth.label}</h3>
+        <button
+          type="button"
+          className="calendar-nav-btn"
+          onClick={() => setVisibleIndex(i => Math.min(months.length - 1, i + 1))}
+          disabled={visibleIndex === months.length - 1}
+          aria-label="Mes siguiente"
+        >
+          →
+        </button>
+      </div>
 
-                return (
-                  <div key={day} className={className} title={`${formatDate(date)}${hasFirst || hasSecond ? ` - ${hasFirst ? '1ª' : ''}${hasFirst && hasSecond ? ' y ' : ''}${hasSecond ? '2ª' : ''}` : ''}`}>
-                    <div className="calendar-day-strip" />
-                    <div className="calendar-slots">
-                      <div className={`calendar-slot ${hasFirst ? 'done' : ''}`} />
-                      <div className={`calendar-slot ${hasSecond ? 'done' : ''}`} />
-                    </div>
-                    <strong>Día {day}</strong>
-                    <span>{formatCalendarDate(date)}</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ))}
+      <div className="calendar-single-month" aria-label="Seguimiento de 84 días">
+        <div className="calendar-grid">
+          {visibleMonth.days.map(({ day, date }) => {
+            const dayInjections = injectionsByDate[date] || {}
+            const hasFirst = !!dayInjections.first
+            const hasSecond = !!dayInjections.second
+            const isToday = date === todayDate
+            const isCurrentDay = day === currentTreatmentDay
+            const status = hasFirst && hasSecond
+              ? 'done'
+              : (hasFirst || hasSecond)
+                ? 'partial'
+                : day < firstTrackedDay
+                  ? 'previous'
+                  : day < currentTreatmentDay
+                    ? 'missed'
+                    : 'pending'
+            const className = [
+              'calendar-day',
+              status,
+              isCurrentDay ? 'current' : '',
+              isToday ? 'today' : '',
+            ].filter(Boolean).join(' ')
+
+            return (
+              <div key={day} className={className} title={`${formatDate(date)}${hasFirst || hasSecond ? ` - ${hasFirst ? '1ª' : ''}${hasFirst && hasSecond ? ' y ' : ''}${hasSecond ? '2ª' : ''}` : ''}`}>
+                <div className="calendar-day-strip" />
+                <div className="calendar-slots">
+                  <div className={`calendar-slot ${hasFirst ? 'done' : ''}`} />
+                  <div className={`calendar-slot ${hasSecond ? 'done' : ''}`} />
+                </div>
+                <strong>Día {day}</strong>
+                <span>{formatCalendarDate(date)}</span>
+                {isToday && <span className="calendar-day-label">Hoy</span>}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
