@@ -1001,6 +1001,102 @@ h1, h2, h3 {
   border-bottom: none;
 }
 
+/* Footer */
+.site-footer {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.site-footer strong {
+  color: var(--ink-soft);
+}
+
+.site-footer a {
+  color: var(--amber-deep);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Auth forgot password */
+.auth-forgot {
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.auth-forgot:hover {
+  color: var(--ink-soft);
+}
+
+.forgot-dialog {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 380px;
+  width: 90%;
+}
+
+.forgot-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.forgot-dialog-content {
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.forgot-dialog-content h3 {
+  font-family: 'Fraunces', serif;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+}
+
+.forgot-dialog-content p {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+.forgot-dialog-content a {
+  color: var(--amber-deep);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.forgot-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.forgot-close:hover {
+  color: var(--rust);
+}
+
+.forgot-hint {
+  font-size: 0.75rem !important;
+  font-style: italic;
+}
+
 @media (max-width: 580px) {
   .app { max-width: 780px; }
   .calendar-grid { grid-template-columns: repeat(4, 1fr); }

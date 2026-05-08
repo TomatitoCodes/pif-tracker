@@ -11,6 +11,7 @@ export default function AuthForm({ mode }) {
   const [firstInjectionTime, setFirstInjectionTime] = useState('08:00')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [showForgot, setShowForgot] = useState(false)
   const isRegister = mode === 'register'
 
   async function handleSubmit(event) {
@@ -99,6 +100,22 @@ export default function AuthForm({ mode }) {
       <button className="btn-log" type="submit" disabled={submitting}>
         {submitting ? 'Guardando...' : isRegister ? 'Crear cuenta' : 'Entrar'}
       </button>
+
+      {!isRegister && (
+        <button type="button" className="auth-forgot" onClick={() => setShowForgot(true)}>
+          ¿Has olvidado tu contraseña?
+        </button>
+      )}
+
+      <dialog className="forgot-dialog" open={showForgot} onClose={() => setShowForgot(false)}>
+        <div className="forgot-dialog-content">
+          <button className="forgot-close" onClick={() => setShowForgot(false)}>×</button>
+          <h3>Recuperar contraseña</h3>
+          <p>No hay recuperación automática. Mandame un correo a:</p>
+          <a href="mailto:hola@garciagarcia.cc?subject=Recuperar%20contraseña%20PIF%20Tracker">hola@garciagarcia.cc</a>
+          <p className="forgot-hint">Decime tu email de registro y te ayudo.</p>
+        </div>
+      </dialog>
     </form>
   )
 }
