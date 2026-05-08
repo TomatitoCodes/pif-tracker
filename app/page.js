@@ -1,3 +1,5 @@
+import FaqContent from './faq-content'
+
 export default function Home() {
   return (
     <main className="app home-page">
@@ -17,6 +19,11 @@ export default function Home() {
           <a className="btn-home" href="/register">Crear cuenta</a>
           <a className="btn-secondary" href="/login">Ya tengo cuenta</a>
         </div>
+      </section>
+
+      <section className="home-faq">
+        <h2>Preguntas frecuentes</h2>
+        <FaqContent />
       </section>
     </main>
   )

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import FaqContent from './faq-content'
+
 const ZONES = [
   { id: 'nuca-izq',    label: 'Nuca Izq.',     color: '#e07b54', cx: 118, cy: 52  },
   { id: 'nuca-der',    label: 'Nuca Der.',      color: '#d4a853', cx: 148, cy: 52  },
@@ -472,6 +474,15 @@ export default function TrackerClient({ initialTreatment }) {
         startDay={initialTreatment.startDay}
         currentTreatmentDay={currentTreatmentDay}
       />
+
+      <div className="tracker-faq">
+        <details className="faq-item faq-collapsed">
+          <summary>Preguntas frecuentes</summary>
+          <div className="faq-collapsed-body">
+            <FaqContent />
+          </div>
+        </details>
+      </div>
 
       <div className={`toast ${toastVisible ? 'show' : ''}`}>{toast}</div>
     </main>
