@@ -400,6 +400,50 @@ h1, h2, h3 {
   color: var(--ink-soft);
 }
 
+/* Slot selector */
+.slot-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.slot-btn {
+  background: var(--cream);
+  border: 1.5px solid var(--amber-light);
+  border-radius: 10px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.5rem 0.4rem;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.slot-btn span {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  font-weight: 400;
+  margin-top: 0.1rem;
+}
+
+.slot-btn:hover {
+  border-color: var(--amber);
+}
+
+.slot-btn.active {
+  background: var(--sage-light);
+  border-color: var(--sage);
+  color: var(--ink);
+}
+
+.slot-btn.active span {
+  color: var(--ink-soft);
+}
+
 .selected-zone-display {
   background: var(--cream);
   border-radius: 10px;
@@ -685,12 +729,38 @@ h1, h2, h3 {
   top: 0;
 }
 
+.calendar-slots {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  margin-top: 0.15rem;
+  margin-bottom: 0.15rem;
+}
+
+.calendar-slot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber-light);
+}
+
+.calendar-slot.done {
+  background: var(--sage);
+}
+
 .calendar-day.done {
   background: #edf5ee;
   color: var(--ink);
 }
 
 .calendar-day.done .calendar-day-strip { background: var(--sage); }
+
+.calendar-day.partial {
+  background: #f5f0e4;
+  color: var(--ink-soft);
+}
+
+.calendar-day.partial .calendar-day-strip { background: var(--amber); }
 
 .calendar-day.previous {
   background: #f3eadf;

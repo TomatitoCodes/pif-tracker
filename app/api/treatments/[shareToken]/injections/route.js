@@ -33,6 +33,7 @@ export async function POST(request, { params }) {
     const injection = await createInjection(params.shareToken, user.id, {
       zone: body.zone,
       date: body.date,
+      slot: body.slot,
       notes: body.notes,
     })
 
@@ -46,7 +47,7 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (error.message === 'Invalid injection zone' || error.message === 'Invalid injection date') {
+    if (error.message === 'Invalid injection zone' || error.message === 'Invalid injection date' || error.message === 'Invalid injection slot' || error.message === 'Injection date is outside the treatment window') {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 

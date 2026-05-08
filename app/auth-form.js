@@ -8,6 +8,7 @@ export default function AuthForm({ mode }) {
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [catName, setCatName] = useState('')
   const [startDay, setStartDay] = useState('1')
+  const [firstInjectionTime, setFirstInjectionTime] = useState('08:00')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const isRegister = mode === 'register'
@@ -21,7 +22,7 @@ export default function AuthForm({ mode }) {
       const response = await fetch(`/api/auth/${isRegister ? 'register' : 'login'}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, passwordConfirmation, catName, startDay }),
+        body: JSON.stringify({ email, password, passwordConfirmation, catName, startDay, firstInjectionTime }),
       })
       const payload = await response.json()
 
@@ -60,6 +61,18 @@ export default function AuthForm({ mode }) {
               <option key={day} value={day}>Día {day}</option>
             ))}
           </select>
+        </label>
+      )}
+
+      {isRegister && (
+        <label>
+          Horario de la primera inyección diaria
+          <input
+            type="time"
+            value={firstInjectionTime}
+            onChange={e => setFirstInjectionTime(e.target.value)}
+            required
+          />
         </label>
       )}
 

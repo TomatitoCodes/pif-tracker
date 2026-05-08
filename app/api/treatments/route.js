@@ -10,7 +10,7 @@ export async function POST(request) {
   try {
     const user = await requireCurrentUser()
     const body = await request.json().catch(() => ({}))
-    const treatment = await createTreatment({ userId: user.id, catName: body.catName, startDay: body.startDay })
+    const treatment = await createTreatment({ userId: user.id, catName: body.catName, startDay: body.startDay, firstInjectionTime: body.firstInjectionTime })
 
     return NextResponse.json({ treatment }, { status: 201 })
   } catch (error) {

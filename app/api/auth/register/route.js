@@ -13,6 +13,7 @@ export async function POST(request) {
     passwordConfirmation: body.passwordConfirmation,
     catName: body.catName,
     startDay: body.startDay,
+    firstInjectionTime: body.firstInjectionTime,
   })
 
   if (result.error) {

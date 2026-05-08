@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const ZONES = [
   { id: 'nuca-izq',    label: 'Nuca Izq.',     color: '#e07b54', cx: 118, cy: 52  },
@@ -30,6 +30,17 @@ function formatMonth(str) {
 function formatCalendarDate(str) {
   const d = new Date(`${str}T12:00:00`)
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+}
+
+function formatTime(timeStr) {
+  return timeStr ? timeStr.slice(0, 5) : '--:--'
+}
+
+function getSecondTime(firstTime) {
+  if (!firstTime) return '20:00'
+  const [h, m] = firstTime.split(':').map(Number)
+  const secondH = (h + 12) % 24
+  return `${String(secondH).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
 function daysDiff(dateStr) {
@@ -180,11 +191,15 @@ export default function TrackerClient({ initialTreatment }) {
   const [history, setHistory] = useState(initialTreatment.injections)
   const [selectedZone, setSelectedZone] = useState(null)
   const [date, setDate] = useState(todayStr())
+  const [slot, setSlot] = useState('first')
   const [notes, setNotes] = useState('')
   const [catName, setCatName] = useState(initialTreatment.catName)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
   const [toastVisible, setToastVisible] = useState(false)
+
+  const firstTime = initialTreatment.firstInjectionTime || '08:00'
+  const secondTime = getSecondTime(firstTime)
 
   const showToast = useCallback((msg) => {
     setToast(msg)
@@ -194,6 +209,15 @@ export default function TrackerClient({ initialTreatment }) {
 
   const suggested = getSuggestedZone(history)
   const currentTreatmentDay = Math.min(Math.max(daysDiff(initialTreatment.startedAt) + 1, 1), 84)
+
+  useEffect(() => {
+    const injectionsForDate = history.filter(e => e.date === date)
+    const hasFirst = injectionsForDate.some(e => e.slot === 'first')
+    const hasSecond = injectionsForDate.some(e => e.slot === 'second')
+    if (!hasFirst && !hasSecond) setSlot('first')
+    else if (hasFirst && !hasSecond) setSlot('second')
+    else if (!hasFirst && hasSecond) setSlot('first')
+  }, [date, history])
 
   async function saveCatName() {
     try {
@@ -222,13 +246,19 @@ export default function TrackerClient({ initialTreatment }) {
   async function handleLog() {
     if (!selectedZone || saving) return
 
+    const injectionsForDate = history.filter(e => e.date === date)
+    if (injectionsForDate.some(e => e.slot === slot)) {
+      showToast(`Ya registraste la ${slot === 'first' ? '1ª' : '2ª'} dosis de ese día`)
+      return
+    }
+
     setSaving(true)
 
     try {
       const response = await fetch(`/api/treatments/${initialTreatment.shareToken}/injections`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ zone: selectedZone, date, notes }),
+        body: JSON.stringify({ zone: selectedZone, date, slot, notes }),
       })
 
       if (!response.ok) throw new Error('Failed to save injection')
@@ -238,7 +268,7 @@ export default function TrackerClient({ initialTreatment }) {
       setSelectedZone(null)
       setNotes('')
       setDate(todayStr())
-      showToast('✓ Inyección registrada')
+      showToast(`✓ ${slot === 'first' ? '1ª' : '2ª'} dosis guardada`)
     } catch {
       showToast('No se pudo guardar')
     } finally {
@@ -342,6 +372,23 @@ export default function TrackerClient({ initialTreatment }) {
               {selectedZone ? `📍 ${ZONE_MAP[selectedZone]?.label}` : 'Haz clic en una zona del gato'}
             </div>
 
+            <div className="slot-selector">
+              <button
+                type="button"
+                className={`slot-btn ${slot === 'first' ? 'active' : ''}`}
+                onClick={() => setSlot('first')}
+              >
+                1ª dosis <span>{formatTime(firstTime)}</span>
+              </button>
+              <button
+                type="button"
+                className={`slot-btn ${slot === 'second' ? 'active' : ''}`}
+                onClick={() => setSlot('second')}
+              >
+                2ª dosis <span>{formatTime(secondTime)}</span>
+              </button>
+            </div>
+
             <input type="date" className="date-input" value={date} onChange={e => setDate(e.target.value)} />
 
             <textarea
@@ -353,7 +400,7 @@ export default function TrackerClient({ initialTreatment }) {
             />
 
             <button className="btn-log" disabled={!selectedZone || saving} onClick={handleLog}>
-              {saving ? 'Guardando...' : 'Guardar'}
+              {saving ? 'Guardando...' : `Guardar ${slot === 'first' ? '1ª' : '2ª'} dosis`}
             </button>
           </div>
 
@@ -377,7 +424,9 @@ export default function TrackerClient({ initialTreatment }) {
                       <div className="history-dot" style={{ background: zone?.color ?? '#ccc' }} />
                       <div className="history-info">
                         <div className="history-zone">{zone?.label ?? entry.zone}</div>
-                        <div className="history-meta">{getRelativeDay(entry.date)}</div>
+                        <div className="history-meta">
+                          {getRelativeDay(entry.date)} · {entry.slot === 'first' ? formatTime(firstTime) : formatTime(secondTime)} ({entry.slot === 'first' ? '1ª' : '2ª'})
+                        </div>
                         {entry.notes && <div className="history-notes">{entry.notes}</div>}
                       </div>
                       <button className="btn-delete-entry" onClick={() => handleDelete(entry.id)} aria-label="Eliminar">
@@ -405,7 +454,12 @@ export default function TrackerClient({ initialTreatment }) {
 }
 
 function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }) {
-  const injectionByDate = Object.fromEntries(history.map(entry => [entry.date, entry]))
+  const injectionsByDate = {}
+  history.forEach(entry => {
+    if (!injectionsByDate[entry.date]) injectionsByDate[entry.date] = {}
+    injectionsByDate[entry.date][entry.slot] = entry
+  })
+
   const firstTrackedDay = Number(startDay) || 1
   const days = Array.from({ length: 84 }, (_, index) => {
     const day = index + 1
@@ -441,14 +495,18 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
             <h3>{month.label}</h3>
             <div className="calendar-grid">
               {month.days.map(({ day, date }) => {
-                const injection = injectionByDate[date]
-                const status = injection
+                const dayInjections = injectionsByDate[date] || {}
+                const hasFirst = !!dayInjections.first
+                const hasSecond = !!dayInjections.second
+                const status = hasFirst && hasSecond
                   ? 'done'
-                  : day < firstTrackedDay
-                    ? 'previous'
-                    : day < currentTreatmentDay
-                      ? 'missed'
-                      : 'pending'
+                  : (hasFirst || hasSecond)
+                    ? 'partial'
+                    : day < firstTrackedDay
+                      ? 'previous'
+                      : day < currentTreatmentDay
+                        ? 'missed'
+                        : 'pending'
                 const className = [
                   'calendar-day',
                   status,
@@ -456,8 +514,12 @@ function TreatmentCalendar({ history, startedAt, startDay, currentTreatmentDay }
                 ].filter(Boolean).join(' ')
 
                 return (
-                  <div key={day} className={className} title={`${formatDate(date)}${injection ? ` - ${injection.zone}` : ''}`}>
+                  <div key={day} className={className} title={`${formatDate(date)}${hasFirst || hasSecond ? ` - ${hasFirst ? '1ª' : ''}${hasFirst && hasSecond ? ' y ' : ''}${hasSecond ? '2ª' : ''}` : ''}`}>
                     <div className="calendar-day-strip" />
+                    <div className="calendar-slots">
+                      <div className={`calendar-slot ${hasFirst ? 'done' : ''}`} />
+                      <div className={`calendar-slot ${hasSecond ? 'done' : ''}`} />
+                    </div>
                     <strong>Día {day}</strong>
                     <span>{formatCalendarDate(date)}</span>
                   </div>
